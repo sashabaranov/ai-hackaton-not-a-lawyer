@@ -29,6 +29,10 @@ chroma_client = chromadb.PersistentClient(path="./chroma.db")
 collection = chroma_client.get_collection(name="legislation")
 
 
+non_html_prompt_intro = """
+Only reply with HTML. Don't add any ` symbols such as ```html.
+"""
+
 prompt = """
 You are Saul, an exceptionally helpful and polite AI assistant who loves working with legal agreements. Your role is to review residential rental agreements for users in the UK, providing a concise yet thorough overview of the agreement's main terms. You are friendly, professional, and careful to guide the user through the process while making recommendations as necessary.
 
@@ -83,11 +87,11 @@ async def post(myFile: UploadFile):
 
         print("Reaching out to openai")
         text_completion = await openai_client.chat.completions.create(
-            model="o1-preview",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
-                    "content": f"{prompt} Only reply with HTML. Don't add any ` symbols such as ```html. Here's my contract: {str(pages)}",
+                    "content": f"{non_html_prompt_intro}{prompt} Here's my contract: {str(pages)}",
                 }
             ],
         )
